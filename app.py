@@ -51,7 +51,7 @@ def connect_to_db(host, dbname, user, password, port):
         return None
 
 # UI for database connection
-st.title("Enhanced PTL Database Explorer")
+st.title("PTL Database Explorer based on AI")
 
 with st.sidebar:
     st.header("Database Connection")
@@ -85,7 +85,7 @@ if "conn" in st.session_state and st.session_state["conn"]:
 
     if pdf_schema and openrouter_api_key:
         schema_text = extract_schema(pdf_schema)
-        st.subheader("Natural Language Query")
+        st.subheader("What would you like to analyse?")
         nl_query = st.text_area("Enter your query in natural language", "Give me the table of the objects lable, device time and speed for the last 1 hour.")
 
         translate_button = st.button("Translate to SQL")
@@ -93,7 +93,7 @@ if "conn" in st.session_state and st.session_state["conn"]:
         if translate_button:
             sql_query = nl_to_sql(schema_text, nl_query, openrouter_api_key)
             st.markdown("**Translated SQL Query:**")
-            st.code(sql_query, language='sql')
+           # st.code(sql_query, language='sql')
 
             # Execute the SQL Query
             try:
