@@ -22,10 +22,8 @@ def nl_to_sql(schema, nl_query, openrouter_api_key):
 
     prompt = f"""
     Given the database schema described belowand taking into consideration 2 data schemas: raw_business_data and raw_telematics_data and tables and atributes in those data schemas, translate the following natural language query into SQL-query. Respond with SQL code ONLY, DO NOT PROVIDE ADDITIONAL INFORMATION, WORDS, SYMBOLS OR FORMATTING:
-
-    Database Schema:
+    Database description with 2 data schemas:
     {schema}
-
     Natural Language Query:
     """ + nl_query
 
