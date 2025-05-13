@@ -16,14 +16,13 @@ def extract_schema(pdf_path):
 # Function to translate natural language to SQL
 def nl_to_sql(schema, nl_query):
     prompt = f"""
-    Given the database schema described below, translate the following natural language query into SQL:
+    Given the database schema described below, translate the following natural language query into SQL-query ONLY. DO NOT add description or other information in the reply - ONLY SQL-QUERY:
 
     Database Schema:
     {schema}
 
     Natural Language Query:
-    """ + nl_query + """\n
-    SQL Query:
+    """ + nl_query + """
     """
 
     response = openai.ChatCompletion.create(
