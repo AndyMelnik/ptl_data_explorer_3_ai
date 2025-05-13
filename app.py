@@ -91,7 +91,7 @@ if "conn" in st.session_state and st.session_state["conn"]:
         if translate_button:
             sql_query = nl_to_sql(schema_text, nl_query, openrouter_api_key)
             st.markdown("**Translated SQL Query:**")
-           # st.code(sql_query, language='sql')
+            st.code(sql_query, language=None)
 
             # Execute the SQL Query
             try:
