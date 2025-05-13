@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import pg8000
 import plotly.express as px
-import openai
+from openai import OpenAI
 import PyPDF2
 
 # Function to read and extract text from PDF schema
@@ -14,23 +14,32 @@ def extract_schema(pdf_path):
     return schema_text
 
 # Function to translate natural language to SQL
-def nl_to_sql(schema, nl_query):
+def nl_to_sql(schema, nl_query, openrouter_api_key):
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=openrouter_api_key,
+    )
+
     prompt = f"""
-    Given the database schema described below, translate the following natural language query into SQL-query ONLY. DO NOT add description or other information in the reply - ONLY SQL-QUERY:
+    Given the database schema described below, translate the following natural language query into SQL-query. respond with SQL-query ONLY, DO NOT PROVIDE ADDITIONAL INFORMATION. SQL-query only!:
 
     Database Schema:
     {schema}
 
     Natural Language Query:
-    """ + nl_query + """
+    """ + nl_query + """\n
+    SQL Query:
     """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4-turbo",
+    response = client.chat.completions.create(
+        extra_headers={},
+        extra_body={},
+        model="openai/gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=500,
+        max_tokens=5000,
         temperature=0
     )
+
     sql_query = response.choices[0].message.content.strip()
     return sql_query
 
@@ -53,7 +62,7 @@ with st.sidebar:
     user = st.text_input("Username", value="client_XXXXXXX_user")
     password = st.text_input("Password", type="password")
     port = st.text_input("Port", value="5432")
-    openai_api_key = st.text_input("OpenAI API Key", type="password")
+    openrouter_api_key = st.text_input("OpenRouter API Key", type="password")
     pdf_schema = st.file_uploader("Upload Schema PDF", type=['pdf'])
 
     connect_button = st.button("Connect")
@@ -76,16 +85,15 @@ with st.sidebar:
 if "conn" in st.session_state and st.session_state["conn"]:
     conn = st.session_state["conn"]
 
-    if pdf_schema and openai_api_key:
-        openai.api_key = openai_api_key
+    if pdf_schema and openrouter_api_key:
         schema_text = extract_schema(pdf_schema)
         st.subheader("Natural Language Query")
-        nl_query = st.text_area("Enter your query in natural language", "Show top 10 objects with the highest revenue.")
+        nl_query = st.text_area("Enter your query in natural language", "Give me the table of the objects lable, device time and speed for the last 1 hour.")
 
         translate_button = st.button("Translate to SQL")
 
         if translate_button:
-            sql_query = nl_to_sql(schema_text, nl_query)
+            sql_query = nl_to_sql(schema_text, nl_query, openrouter_api_key)
             st.markdown("**Translated SQL Query:**")
             st.code(sql_query, language='sql')
 
