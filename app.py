@@ -32,7 +32,7 @@ def nl_to_sql(schema, nl_query, openrouter_api_key):
         extra_body={},
         model="openai/gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=5000,
+        max_tokens=10000,
         temperature=0
     )
 
