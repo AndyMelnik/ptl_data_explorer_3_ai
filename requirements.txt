@@ -1,0 +1,6 @@
+streamlit
+pandas
+pg8000
+plotly
+openai
+PyPDF2
