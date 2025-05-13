@@ -90,7 +90,7 @@ if "conn" in st.session_state and st.session_state["conn"]:
 
         if translate_button:
             sql_query = nl_to_sql(schema_text, nl_query, openrouter_api_key)
-            st.markdown("**Translated SQL Query:**")
+            st.markdown("**Translated SQL Query. Please, check the code.**")
             st.code(sql_query, language=None)
 
             # Execute the SQL Query
@@ -107,11 +107,30 @@ if "conn" in st.session_state and st.session_state["conn"]:
         if not df.empty:
             st.subheader("Plot Data")
 
-            x_axis = st.selectbox("Select X-axis", df.columns, key="x_axis")
-            y_axis = st.selectbox("Select Y-axis", df.columns, key="y_axis")
+            # Optional filtering widgets
+            st.markdown("**Optional Filters:**")
+            filter_columns = st.multiselect("Select columns to filter by", df.columns)
+            filters = {}
+            for col in filter_columns:
+                unique_vals = df[col].dropna().unique()
+                selected_vals = st.multiselect(f"Filter values for {col}", unique_vals)
+                if selected_vals:
+                    filters[col] = selected_vals
 
-            plot_button = st.button("Plot Results")
+            # Apply filters
+            filtered_df = df.copy()
+            for col, vals in filters.items():
+                filtered_df = filtered_df[filtered_df[col].isin(vals)]
+
+            x_axis = st.selectbox("Select X-axis", filtered_df.columns, key="x_axis")
+            y_axis = st.selectbox("Select Y-axis", filtered_df.columns, key="y_axis")
+
+            color_by = None
+            if filters:
+                color_by = st.selectbox("Color by (based on selected filters)", list(filters.keys()))
+
+            plot_button = st.button("Plot it!")
 
             if plot_button:
-                fig = px.bar(df, x=x_axis, y=y_axis, title="Data Visualization")
+                fig = px.line(filtered_df, x=x_axis, y=y_axis, color=color_by, title="Line Chart")
                 st.plotly_chart(fig)
