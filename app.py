@@ -83,23 +83,28 @@ if "conn" in st.session_state and st.session_state["conn"]:
 
     if pdf_schema and openrouter_api_key:
         schema_text = extract_schema(pdf_schema)
-        st.subheader("What would you like to analyse?")
-        nl_query = st.text_area("Enter your query in natural language", "Give me the table of the objects lable, device time and speed for the last 1 hour.")
+        st.subheader("Natural Language Query")
+        nl_query = st.text_area("Enter your query in natural language", "Show top 10 objects with the highest revenue.")
 
         translate_button = st.button("Translate to SQL")
 
         if translate_button:
             sql_query = nl_to_sql(schema_text, nl_query, openrouter_api_key)
-            st.markdown("**Translated SQL Query. Please, check the code.**")
-            st.code(sql_query, language=None)
+            st.session_state["sql_query"] = sql_query
 
-            # Execute the SQL Query
-            try:
-                df = pd.read_sql(sql_query, conn)
-                st.session_state["df"] = df
-                st.dataframe(df)
-            except Exception as e:
-                st.error(f"Query execution error: {e}")
+        if "sql_query" in st.session_state:
+            st.markdown("**Edit Translated SQL Query:**")
+            sql_query = st.text_area("SQL Query", st.session_state["sql_query"], height=150)
+
+            execute_button = st.button("Execute SQL")
+
+            if execute_button:
+                try:
+                    df = pd.read_sql(sql_query, conn)
+                    st.session_state["df"] = df
+                    st.dataframe(df)
+                except Exception as e:
+                    st.error(f"Query execution error: {e}")
 
     # Visualization of results
     if "df" in st.session_state:
