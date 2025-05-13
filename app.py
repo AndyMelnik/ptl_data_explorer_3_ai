@@ -84,7 +84,7 @@ if "conn" in st.session_state and st.session_state["conn"]:
     if pdf_schema and openrouter_api_key:
         schema_text = extract_schema(pdf_schema)
         st.subheader("What would you like to analyze today?")
-        nl_query = st.text_area("Enter your query in human language", "Show me the list of object label with speed for the last 1 hour.")
+        nl_query = st.text_area("Enter your query in human language", "Show me the list of object label with speed by time for the last 1 hour where speed is not equal to 0.")
 
         translate_button = st.button("Translate to SQL")
 
