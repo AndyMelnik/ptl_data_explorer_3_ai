@@ -21,15 +21,13 @@ def nl_to_sql(schema, nl_query, openrouter_api_key):
     )
 
     prompt = f"""
-    Given the database schema described below, translate the following natural language query into SQL-query. respond with SQL-query ONLY, DO NOT PROVIDE ADDITIONAL INFORMATION. SQL-query only!:
+    Given the database schema described below including 2 data schemas raw_business_data and raw_telematics_data, translate the following natural language query into SQL-query. Respond with SQL code ONLY, DO NOT PROVIDE ADDITIONAL INFORMATION, words or symbols:
 
     Database Schema:
     {schema}
 
     Natural Language Query:
-    """ + nl_query + """\n
-    SQL Query:
-    """
+    """ + nl_query
 
     response = client.chat.completions.create(
         extra_headers={},
